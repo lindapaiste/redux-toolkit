@@ -1,17 +1,17 @@
 import { createDraftSafeSelector } from '../createDraftSafeSelector'
 import { EntityState, EntitySelectors, Dictionary, EntityId } from './models'
 
-export function createSelectorsFactory<T>() {
-  function getSelectors(): EntitySelectors<T, EntityState<T>>
+export function createSelectorsFactory<T, I extends EntityId>() {
+  function getSelectors(): EntitySelectors<T, EntityState<T, I>, I>
   function getSelectors<V>(
-    selectState: (state: V) => EntityState<T>
-  ): EntitySelectors<T, V>
+    selectState: (state: V) => EntityState<T, I>
+  ): EntitySelectors<T, V, I>
   function getSelectors(
-    selectState?: (state: any) => EntityState<T>
-  ): EntitySelectors<T, any> {
+    selectState?: (state: any) => EntityState<T, I>
+  ): EntitySelectors<T, any, I> {
     const selectIds = (state: any) => state.ids
 
-    const selectEntities = (state: EntityState<T>) => state.entities
+    const selectEntities = (state: EntityState<T, I>) => state.entities
 
     const selectAll = createDraftSafeSelector(
       selectIds,

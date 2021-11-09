@@ -11,11 +11,11 @@ import { createSelector, Selector } from 'reselect'
 describe('Entity State Selectors', () => {
   describe('Composed Selectors', () => {
     interface State {
-      books: EntityState<BookModel>
+      books: EntityState<BookModel, string>
     }
 
-    let adapter: EntityAdapter<BookModel>
-    let selectors: EntitySelectors<BookModel, State>
+    let adapter: EntityAdapter<BookModel, string>
+    let selectors: EntitySelectors<BookModel, State, string>
     let state: State
 
     beforeEach(() => {

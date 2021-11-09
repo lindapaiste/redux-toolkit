@@ -1,25 +1,25 @@
 import createNextState, { isDraft } from 'immer'
-import { EntityState, PreventAny } from './models'
+import { EntityId, EntityState, PreventAny } from './models'
 import { PayloadAction, isFSA } from '../createAction'
 
-export function createSingleArgumentStateOperator<V>(
-  mutator: (state: EntityState<V>) => void
+export function createSingleArgumentStateOperator<V, I extends EntityId>(
+  mutator: (state: EntityState<V, I>) => void
 ) {
-  const operator = createStateOperator((_: undefined, state: EntityState<V>) =>
+  const operator = createStateOperator((_: undefined, state: EntityState<V, I>) =>
     mutator(state)
   )
 
-  return function operation<S extends EntityState<V>>(
+  return function operation<S extends EntityState<V, I>>(
     state: PreventAny<S, V>
   ): S {
     return operator(state as S, undefined)
   }
 }
 
-export function createStateOperator<V, R>(
-  mutator: (arg: R, state: EntityState<V>) => void
+export function createStateOperator<V, R, I extends EntityId>(
+  mutator: (arg: R, state: EntityState<V, I>) => void
 ) {
-  return function operation<S extends EntityState<V>>(
+  return function operation<S extends EntityState<V, I>>(
     state: S,
     arg: R | PayloadAction<R>
   ): S {
@@ -29,7 +29,7 @@ export function createStateOperator<V, R>(
       return isFSA(arg)
     }
 
-    const runMutator = (draft: EntityState<V>) => {
+    const runMutator = (draft: EntityState<V, I>) => {
       if (isPayloadActionArgument(arg)) {
         mutator(arg.payload, draft)
       } else {

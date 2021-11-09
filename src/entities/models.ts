@@ -14,7 +14,7 @@ export type Comparer<T> = (a: T, b: T) => number
 /**
  * @public
  */
-export type IdSelector<T> = (model: T) => EntityId
+export type IdSelector<T, I extends EntityId> = (model: T) => I
 
 /**
  * @public
@@ -33,21 +33,21 @@ export interface Dictionary<T> extends DictionaryNum<T> {
 /**
  * @public
  */
-export type Update<T> = { id: EntityId; changes: Partial<T> }
+export type Update<T, I extends EntityId> = { id: I; changes: Partial<T> }
 
 /**
  * @public
  */
-export interface EntityState<T> {
-  ids: EntityId[]
+export interface EntityState<T, I extends EntityId> {
+  ids: I[]
   entities: Dictionary<T>
 }
 
 /**
  * @public
  */
-export interface EntityDefinition<T> {
-  selectId: IdSelector<T>
+export interface EntityDefinition<T, I extends EntityId> {
+  selectId: IdSelector<T, I>
   sortComparer: false | Comparer<T>
 }
 
@@ -56,103 +56,101 @@ export type PreventAny<S, T> = IsAny<S, EntityState<T>, S>
 /**
  * @public
  */
-export interface EntityStateAdapter<T> {
-  addOne<S extends EntityState<T>>(state: PreventAny<S, T>, entity: T): S
-  addOne<S extends EntityState<T>>(
+export interface EntityStateAdapter<T, I extends EntityId> {
+  addOne<S extends EntityState<T, I>>(state: PreventAny<S, T>, entity: T): S
+  addOne<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
     action: PayloadAction<T>
   ): S
 
-  addMany<S extends EntityState<T>>(
+  addMany<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    entities: T[] | Record<EntityId, T>
+    entities: T[] | Record<I, T>
   ): S
-  addMany<S extends EntityState<T>>(
+  addMany<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    entities: PayloadAction<T[] | Record<EntityId, T>>
-  ): S
-
-  setAll<S extends EntityState<T>>(
-    state: PreventAny<S, T>,
-    entities: T[] | Record<EntityId, T>
-  ): S
-  setAll<S extends EntityState<T>>(
-    state: PreventAny<S, T>,
-    entities: PayloadAction<T[] | Record<EntityId, T>>
+    entities: PayloadAction<T[] | Record<I, T>>
   ): S
 
-  removeOne<S extends EntityState<T>>(state: PreventAny<S, T>, key: EntityId): S
-  removeOne<S extends EntityState<T>>(
+  setAll<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    key: PayloadAction<EntityId>
+    entities: T[] | Record<I, T>
+  ): S
+  setAll<S extends EntityState<T, I>>(
+    state: PreventAny<S, T>,
+    entities: PayloadAction<T[] | Record<I, T>>
   ): S
 
-  removeMany<S extends EntityState<T>>(
+  removeOne<S extends EntityState<T, I>>(state: PreventAny<S, T>, key: I): S
+  removeOne<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    keys: EntityId[]
-  ): S
-  removeMany<S extends EntityState<T>>(
-    state: PreventAny<S, T>,
-    keys: PayloadAction<EntityId[]>
+    key: PayloadAction<I>
   ): S
 
-  removeAll<S extends EntityState<T>>(state: PreventAny<S, T>): S
-
-  updateOne<S extends EntityState<T>>(
+  removeMany<S extends EntityState<T, I>>(state: PreventAny<S, T>, keys: I[]): S
+  removeMany<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    update: Update<T>
-  ): S
-  updateOne<S extends EntityState<T>>(
-    state: PreventAny<S, T>,
-    update: PayloadAction<Update<T>>
+    keys: PayloadAction<I[]>
   ): S
 
-  updateMany<S extends EntityState<T>>(
+  removeAll<S extends EntityState<T, I>>(state: PreventAny<S, T>): S
+
+  updateOne<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    updates: Update<T>[]
+    update: Update<T, I>
   ): S
-  updateMany<S extends EntityState<T>>(
+  updateOne<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    updates: PayloadAction<Update<T>[]>
+    update: PayloadAction<Update<T, I>>
   ): S
 
-  upsertOne<S extends EntityState<T>>(state: PreventAny<S, T>, entity: T): S
-  upsertOne<S extends EntityState<T>>(
+  updateMany<S extends EntityState<T, I>>(
+    state: PreventAny<S, T>,
+    updates: Update<T, I>[]
+  ): S
+  updateMany<S extends EntityState<T, I>>(
+    state: PreventAny<S, T>,
+    updates: PayloadAction<Update<T, I>[]>
+  ): S
+
+  upsertOne<S extends EntityState<T, I>>(state: PreventAny<S, T>, entity: T): S
+  upsertOne<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
     entity: PayloadAction<T>
   ): S
 
-  upsertMany<S extends EntityState<T>>(
+  upsertMany<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    entities: T[] | Record<EntityId, T>
+    entities: T[] | Record<I, T>
   ): S
-  upsertMany<S extends EntityState<T>>(
+  upsertMany<S extends EntityState<T, I>>(
     state: PreventAny<S, T>,
-    entities: PayloadAction<T[] | Record<EntityId, T>>
+    entities: PayloadAction<T[] | Record<I, T>>
   ): S
 }
 
 /**
  * @public
  */
-export interface EntitySelectors<T, V> {
-  selectIds: (state: V) => EntityId[]
+export interface EntitySelectors<T, V, I extends EntityId> {
+  selectIds: (state: V) => I[]
   selectEntities: (state: V) => Dictionary<T>
   selectAll: (state: V) => T[]
   selectTotal: (state: V) => number
-  selectById: (state: V, id: EntityId) => T | undefined
+  selectById: (state: V, id: I) => T | undefined
 }
 
 /**
  * @public
  */
-export interface EntityAdapter<T> extends EntityStateAdapter<T> {
-  selectId: IdSelector<T>
+export interface EntityAdapter<T, I extends EntityId>
+  extends EntityStateAdapter<T, I> {
+  selectId: IdSelector<T, I>
   sortComparer: false | Comparer<T>
-  getInitialState(): EntityState<T>
-  getInitialState<S extends object>(state: S): EntityState<T> & S
-  getSelectors(): EntitySelectors<T, EntityState<T>>
+  getInitialState(): EntityState<T, I>
+  getInitialState<S extends object>(state: S): EntityState<T, I> & S
+  getSelectors(): EntitySelectors<T, EntityState<T, I>, I>
   getSelectors<V>(
-    selectState: (state: V) => EntityState<T>
-  ): EntitySelectors<T, V>
+    selectState: (state: V) => EntityState<T, I>
+  ): EntitySelectors<T, V, I>
 }

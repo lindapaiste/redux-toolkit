@@ -10,8 +10,8 @@ import {
 import { createNextState } from '..'
 
 describe('Unsorted State Adapter', () => {
-  let adapter: EntityStateAdapter<BookModel>
-  let state: EntityState<BookModel>
+  let adapter: EntityStateAdapter<BookModel, string>
+  let state: EntityState<BookModel, string>
 
   beforeAll(() => {
     //eslint-disable-next-line

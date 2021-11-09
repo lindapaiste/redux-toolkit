@@ -1,4 +1,10 @@
-import { EntityDefinition, Comparer, IdSelector, EntityAdapter } from './models'
+import {
+  EntityDefinition,
+  Comparer,
+  IdSelector,
+  EntityAdapter,
+  EntityId
+} from './models'
 import { createInitialStateFactory } from './entity_state'
 import { createSelectorsFactory } from './state_selectors'
 import { createSortedStateAdapter } from './sorted_state_adapter'
@@ -10,20 +16,20 @@ import { createUnsortedStateAdapter } from './unsorted_state_adapter'
  *
  * @public
  */
-export function createEntityAdapter<T>(
+export function createEntityAdapter<T, I extends EntityId>(
   options: {
-    selectId?: IdSelector<T>
+    selectId?: IdSelector<T, I>
     sortComparer?: false | Comparer<T>
   } = {}
-): EntityAdapter<T> {
-  const { selectId, sortComparer }: EntityDefinition<T> = {
+): EntityAdapter<T, I> {
+  const { selectId, sortComparer }: EntityDefinition<T, I> = {
     sortComparer: false,
     selectId: (instance: any) => instance.id,
     ...options
   }
 
-  const stateFactory = createInitialStateFactory<T>()
-  const selectorsFactory = createSelectorsFactory<T>()
+  const stateFactory = createInitialStateFactory<T, I>()
+  const selectorsFactory = createSelectorsFactory<T, I>()
   const stateAdapter = sortComparer
     ? createSortedStateAdapter(selectId, sortComparer)
     : createUnsortedStateAdapter(selectId)
